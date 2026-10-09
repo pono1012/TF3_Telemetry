@@ -236,7 +236,7 @@ def format_route_usage(loaded, total, ratio):
 
 # -------------------------------------------------------------
 # INTELLIGENT CARRIER & CARGO CLASSIFICATION
-# Unterstützt 'Auto line namer' und Standard-Namen
+# Standardisierte Transportcodes und Engine-Erkennung
 # -------------------------------------------------------------
 CARGO_EMOJIS = {
     "Kohle": "🪨 Kohle",
@@ -259,7 +259,7 @@ def classify_line(line_name, vehicles=None, engine_carrier=None):
     nl = line_name.strip()
     nl_upper = nl.upper()
     
-    # 1. High Priority: Explicit Prefix from Auto Line Namer
+    # 1. High Priority: Explicit Transport Code Prefixes (RC, TR, etc.)
     # RC = Road Cargo (LKW), TR = Truck
     if nl_upper.startswith("RC ") or nl_upper.startswith("TR "):
         return "ROAD_CARGO"

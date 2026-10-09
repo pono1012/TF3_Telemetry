@@ -62,7 +62,7 @@ local function serialize_json(val)
 end
 
 -- ============================================================
--- AUTO LINE NAMER EXTRACTION & CACHING LOGIC
+-- ENGINE ENTITY & STATION CACHING LOGIC
 -- ============================================================
 local function entityName(entity)
     if not entity then return nil end
