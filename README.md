@@ -14,7 +14,6 @@
 
 <br/>
 
-![TF3 Live Telemetry Banner](docs/screenshots/mod_preview_banner.jpg)
 
 <p align="center">
   <b>Language:</b> 
