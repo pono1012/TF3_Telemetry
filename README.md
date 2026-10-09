@@ -94,13 +94,12 @@ Data can be monitored seamlessly on your desktop browser, an auxiliary display, 
 
 ```text
 TF3_Telemetry/
-├── companion-mod/              # Transport Fever 3 In-Game Mods
-│   ├── tf3_telemetry/          # Native telemetry collector (C++ Engine Hook)
-│   │   ├── _metadata/          # Mod icon (0.png) & modinfo.json
-│   │   ├── content/            # In-game Lua scripts (telemetry.script.lua, ...)
-│   │   ├── mod.json            # Mod manifest
-│   │   └── README.md
-│   └── auto_line_namer/        # Enhanced Auto-Line-Namer (City-first alphabetical grouping)
+├── companion-mod/              # Transport Fever 3 In-Game Mod
+│   └── tf3_telemetry/          # Native telemetry collector (C++ Engine Hook)
+│       ├── _metadata/          # Mod icon (0.png) & modinfo.json
+│       ├── content/            # In-game Lua scripts (telemetry.script.lua, ...)
+│       ├── mod.json            # Mod manifest
+│       └── README.md
 ├── docs/                       # Documentation assets
 │   └── screenshots/            # High-res screenshots & banners
 ├── public/                     # Web Cockpit frontend
@@ -183,17 +182,12 @@ The dashboard works out-of-the-box with automatic discovery. For custom installa
 
 ---
 
-## 📦 Companion Mods & Attribution
+## 📦 Mod Attribution & Credits
 
 * **`tf3_telemetry`** *(Original)*:
   * In-game engine hook and telemetry streamer for Transport Fever 3.
   * Developed by **pono1012**.
   * License: [MIT](LICENSE).
-
-* **`auto_line_namer`** *(Fork / Adaptation)*:
-  * Based on the original mod for Transport Fever 3 by **Dave W (BeautifulCheez)** (mod.io ID `6414403`), which originated from the TF2 mod by **Erkan Ercan**.
-  * **Enhancement:** Town names are prepended to line names (`{townNames} - ...`), allowing alphabetical sorting in the game's Line Manager to cluster all lines belonging to the same city together.
-  * License: MIT License (see [`companion-mod/auto_line_namer/LICENSE`](companion-mod/auto_line_namer/LICENSE)).
 
 ---
 
