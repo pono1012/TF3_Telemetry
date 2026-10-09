@@ -2,7 +2,7 @@
 
 # 🚅 Transport Fever 3 — Live Telemetry & Fleet Cockpit Suite
 
-**Echtzeit-Telemetrie, Flotten-Monitoring und Finanz-Analytics für Transport Fever 3 direkt aus der C++ Game-Engine.**
+**Real-time telemetry, fleet operations monitoring, and financial analytics for Transport Fever 3 directly hooked into the C++ game engine.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Transport Fever 3](https://img.shields.io/badge/Game-Transport%20Fever%203-orange.svg)](https://www.transportfever2.com)
@@ -15,14 +15,22 @@
 
 ![TF3 Live Telemetry Banner](docs/screenshots/mod_preview_banner.jpg)
 
+<p align="center">
+  <b>Language:</b> 
+  <a href="#-overview">🇬🇧 English (Primary)</a> • 
+  <a href="#-deutsche-kurzanleitung">🇩🇪 Deutsch (German Guide)</a>
+</p>
+
 </div>
 
 ---
 
-## 🌟 Überblick
+## 🌟 Overview
 
-Die **TF3 Telemetrie & Cockpit Suite** ist ein modernes, zweitbildschirmfähiges Live-Dashboard und Analyse-Tool für **Transport Fever 3**. 
-Mithilfe eines nativen In-Game Engine-Hooks werden Fahrzeugbewegungen, Linienauslastungen, Finanzen, Wartungszustände und Terminalstaus ohne spürbare Performance-Einbußen extrahiert und live im Web-Browser oder auf dem Tablet angezeigt.
+The **TF3 Telemetry & Fleet Cockpit Suite** is a modern, second-screen-capable live dashboard and analytics platform for **Transport Fever 3**. 
+Powered by a native in-game engine hook, it extracts live vehicle positions, line loads, maintenance states, finances, and terminal backlogs without any perceptible game performance impact ($O(1)$ in-memory lookups, $<0.1\text{ ms}$ overhead).
+
+Data can be monitored seamlessly on your desktop browser, an auxiliary display, or on an **iPad/tablet** via instant LAN QR-code pairing.
 
 ---
 
@@ -30,22 +38,22 @@ Mithilfe eines nativen In-Game Engine-Hooks werden Fahrzeugbewegungen, Linienaus
 
 <div align="center">
 
-### 📊 Modernes Live-Cockpit (Executive Dashboard)
-*Echtzeit-Kennzahlen, Kontostand, Liquidität, Netzwerkauslastung und smarte Fahrzeug-Verschiebungsvorschläge.*
+### 📊 Modern Live Cockpit (Executive Dashboard)
+*Real-time KPIs, treasury balance, liquidity curves, network utilization, and smart vehicle rebalance recommendations.*
 
 ![Live Executive Dashboard](docs/screenshots/dashboard_overview.png)
 
 <br/>
 
-### 📋 Detaillierte Linien- & Flotten-Übersicht
-*Filter nach Verkehrsträgern (Schiene, Straße, Wasser, Luft), Live-Füllstand, Taktzeiten und Fahrzeugkondition.*
+### 📋 Comprehensive Line & Fleet Breakdown
+*Filter by transit carrier (Rail, Road Cargo, Public Transit, Maritime, Aviation) with real-time capacity, intervals, and vehicle health.*
 
-![Linien-Übersicht](docs/screenshots/dashboard_lines.png)
+![Line Management Breakdown](docs/screenshots/dashboard_lines.png)
 
 <br/>
 
-### 📈 Finanz- & Trend-Analysen
-*3600-Tick Treasury-Historie, Darlehenszinsen und Auslastungsverläufe.*
+### 📈 Financial & Predictive Trend Analytics
+*3,600-tick historical treasury tracking, loan interest breakdown, cashflow velocity, and fleet utilization curves.*
 
 ![Analytics & Charts](docs/screenshots/dashboard_analytics.png)
 
@@ -55,142 +63,159 @@ Mithilfe eines nativen In-Game Engine-Hooks werden Fahrzeugbewegungen, Linienaus
 
 ## ⚡ Key Features
 
-* **⚡ Nativer Game-Engine Hook (Zero-Lag)**:
-  * Minimaler Overhead durch adaptive Tickraten (5s bei Stillstand/Pause, 2s im Spielgeschehen) und $O(1)$ In-Memory Caching.
-* **🌐 Web-Dashboard & Tablet-Modus**:
-  * Läuft im Web-Browser auf `http://localhost:3000`.
-  * Integrierter **QR-Code & LAN-IP-Erkennung** für nahtlose Nutzung auf iPad, Tablet oder Zweitmonitor.
-* **🚚 5-Kategorien Flotten-Klassifizierung**:
-  * 🚚 **Güter & LKW** (Road Cargo)
-  * 🚌 **ÖPNV & Busse / Trams** (Road Passenger)
-  * 🚆 **Eisenbahn & Züge** (Rail)
-  * 🚢 **Schifffahrt & Fähren** (Water)
-  * ✈️ **Luftfahrt & Flugzeuge** (Air)
-* **🔧 Wartung, Alter & Strafkosten**:
-  * Erfasst den Fahrzeugzustand von `0%` bis `100%` (`getVehicleMaintenanceState`).
-  * Berechnet reale Betriebskostenstrafen (`+15%` bis `+25%`) durch Überalterung.
-  * Automatische Benachrichtigung bei schlechtem Fuhrpark-Zustand.
-* **⚠️ Stau- & Engpass-Erkennung**:
-  * Erkennt Staus (`0 km/h` bei beladenen Fahrzeugen auf freier Strecke).
-  * Zeigt wartende Passagiere und Frachtstücke an Haltestellen & Terminals.
-  * Warnung vor 100% Leerfahrten.
-* **💡 Smarter Fahrzeug-Berater**:
-  * Schlägt automatische Fahrzeugverschiebungen von schwach ausgelasteten Linien (< 20%) auf überfüllte Linien mit Engpässen vor ($0 Investition).
-* **💾 Persistente Historie**:
-  * Zeichnet bis zu 3600 Datenpunkte des Cashflows und der Liquidität für Verlaufsdiagramme auf.
+* **⚡ Native Game Engine Hook (Zero-Lag)**:
+  * Minimal overhead through adaptive tick rates (5s during game pause/idle, 2s active gameplay) and cached $O(1)$ memory queries.
+* **🌐 Web Cockpit & Second-Screen / Tablet Mode**:
+  * Runs in any web browser at `http://localhost:3000`.
+  * Built-in **LAN IP auto-detection & QR Code** for quick pairing on iPads, tablets, or phones.
+* **🚚 5-Category Fleet Classification**:
+  * 🚚 **Road Cargo & Trucks**
+  * 🚌 **Public Transit & Buses / Trams**
+  * 🚆 **Rail & Trains**
+  * 🚢 **Maritime & Ships / Ferries**
+  * ✈️ **Aviation & Aircraft**
+* **🔧 Fleet Health, Aging & Penalty Costs**:
+  * Real-time condition tracking from `0%` to `100%` (`getVehicleMaintenanceState`).
+  * Calculates active running cost penalties (`+15%` to `+25%`) caused by poor maintenance.
+  * Instant alerts when vehicles require immediate depot overhaul.
+* **⚠️ Congestion, Bottleneck & Empty Run Detection**:
+  * Automatic traffic jam detection (`0 km/h` on loaded vehicles along open track/road).
+  * Station & terminal backlog tracking (waiting passengers and cargo heaps).
+  * 100% empty-run warnings.
+* **💡 Smart Rebalance Advisor ($0 Investment)**:
+  * Analyzes lines with low utilization (< 20%) and recommends transferring surplus vehicles to overcrowded bottleneck lines.
+* **💾 Persistent Historical Analytics**:
+  * Stores up to 3,600 rolling historical ticks for treasury curves and financial runway projections.
 
 ---
 
-## 📁 Repository-Struktur
+## 📁 Repository Structure
 
 ```text
 TF3_Telemetry/
 ├── companion-mod/              # Transport Fever 3 In-Game Mods
-│   ├── tf3_telemetry/          # Unser nativer Telemetrie-Collector (Engine Hook)
-│   │   ├── _metadata/          # In-Game Icon (0.png) & modinfo.json
-│   │   ├── content/            # Lua Engine Scripts (telemetry.script.lua, ...)
-│   │   ├── mod.json            # Mod-Manifest
+│   ├── tf3_telemetry/          # Native telemetry collector (C++ Engine Hook)
+│   │   ├── _metadata/          # Mod icon (0.png) & modinfo.json
+│   │   ├── content/            # In-game Lua scripts (telemetry.script.lua, ...)
+│   │   ├── mod.json            # Mod manifest
 │   │   └── README.md
-│   └── auto_line_namer/        # Modifizierter Auto-Line-Namer (Alphabetische Stadt-Sortierung)
-├── docs/                       # Dokumentation & Assets
-│   └── screenshots/            # Hochauflösende Screenshots & Banner
-├── public/                     # Web-Cockpit Frontend
-│   ├── css/                    # Glassmorphism Styles & Responsive Layouts
-│   ├── js/                     # Dashboard-Logik, WebSocket Client & Charts
-│   └── index.html              # Cockpit Single-Page-App
-├── server.js                   # Node.js Express & WebSocket Live-Server
-├── start_cockpit.bat           # 1-Klick Starter für das Web-Dashboard
-├── install_mod.bat             # 1-Klick Installer für den TF3 In-Game Mod
-├── create_telemetry_mod.py     # Automatisierter Mod-Deployer & Engine-Hook-Generator
-├── live_monitor.py             # Optionaler Python SQLite-Logger & Data-Mining-Engine
-├── debug_monitor.py            # Optionales Terminal-basiertes ANSI Live-Dashboard
-├── validate_lua.py             # Linter für In-Game Lua Script-Integrität
-├── package.json                # Node.js Paket-Definition
-├── LICENSE                     # MIT Lizenz
-└── README.md                   # Projektdokumentation
+│   └── auto_line_namer/        # Enhanced Auto-Line-Namer (City-first alphabetical grouping)
+├── docs/                       # Documentation assets
+│   └── screenshots/            # High-res screenshots & banners
+├── public/                     # Web Cockpit frontend
+│   ├── css/                    # Glassmorphism dark UI & responsive styles
+│   ├── js/                     # Dashboard controller, WebSocket client & charts
+│   └── index.html              # Cockpit single-page application
+├── server.js                   # Node.js Express & WebSocket streaming server
+├── start_cockpit.bat           # 1-Click launcher for the web dashboard
+├── install_mod.bat             # 1-Click installer for the TF3 companion mod
+├── create_telemetry_mod.py     # Automated mod deployer & engine-hook generator
+├── live_monitor.py             # Optional Python SQLite logger & data-mining engine
+├── debug_monitor.py            # Optional ANSI terminal live dashboard
+├── validate_lua.py             # Lua syntax & token validator
+├── package.json                # Node.js project manifest
+├── LICENSE                     # MIT License
+└── README.md                   # Primary project documentation
 ```
 
 ---
 
-## 🚀 Installation & Schnellstart
+## 🚀 Installation & Quick Start
 
-### Schritt 1: In-Game Mod installieren
+### Step 1: Install the In-Game Companion Mod
 
-Wähle **eine** der beiden Installationsmethoden:
+Choose **one** of the following two options:
 
-#### Methode A — Automatisch per 1-Klick (Empfohlen)
-Doppelklicke auf [`install_mod.bat`](install_mod.bat) (oder führe `python create_telemetry_mod.py` aus).
-> *Das Skript erkennt automatisch gängige Installationspfade von Transport Fever 3 und kopiert den Mod einsatzbereit in das Spiel.*
+#### Option A — Automatic 1-Click Installer (Recommended)
+Double-click [`install_mod.bat`](install_mod.bat) (or run `python create_telemetry_mod.py`).
+> *The installer automatically detects common Transport Fever 3 game directories across Steam and standalone installations, deploying the mod files directly.*
 
-#### Methode B — Manuell per Drag & Drop
-Kopiere den Ordner [`companion-mod/tf3_telemetry`](companion-mod/tf3_telemetry) in dein Transport Fever 3 Mod-Verzeichnis:
+#### Option B — Manual Drag & Drop
+Copy the folder [`companion-mod/tf3_telemetry`](companion-mod/tf3_telemetry) into your Transport Fever 3 `mods` directory:
 * **Steam:** `Steam/steamapps/common/Transport Fever 3/mods/tf3_telemetry`
-* **Release / Manuell:** `<Spielordner>/Transport Fever 3/mods/release/tf3_telemetry`
+* **Standalone / Release:** `<GameDirectory>/Transport Fever 3/mods/release/tf3_telemetry`
 
-*Danach im Spiel:* Spielstand laden, in den Mod-Einstellungen **"TF3 Live Telemetrie & Cockpit"** aktivieren und Spiel starten.
+*In-Game:* Load your savegame, open the mod settings dialog, enable **"TF3 Live Telemetrie & Cockpit"**, and launch your game.
 
 ---
 
-### Schritt 2: Web-Cockpit starten
+### Step 2: Start the Web Cockpit Dashboard
 
-1. **Voraussetzung:** [Node.js](https://nodejs.org/) (Version 18 oder neuer) ist installiert.
-2. Doppelklicke auf [`start_cockpit.bat`](start_cockpit.bat).
-   * *Alternativ über das Terminal:*
+1. **Prerequisite:** [Node.js](https://nodejs.org/) (Version 18 or newer) installed.
+2. Double-click [`start_cockpit.bat`](start_cockpit.bat).
+   * *Or start manually via terminal:*
      ```bash
      npm install
      npm start
      ```
-3. Dein Browser öffnet sich automatisch unter:
+3. Your browser will automatically open:
    ```text
    http://localhost:3000
    ```
-4. **Tablet / Zweitbildschirm:** Klicke oben rechts auf den Button **"Tablet / Mobil"** und scanne den angezeigten QR-Code mit deinem Smartphone oder Tablet im selben WLAN-Netzwerk!
+4. **Tablet / Second-Screen Mode:** Click the **"Tablet / Mobil"** button in the top navigation bar and scan the displayed QR code with your iPad or mobile device connected to the same local Wi-Fi.
 
 ---
 
-### Schritt 3 (Optional): Terminal-Monitore nutzen
+### Step 3 (Optional): Terminal Monitors
 
-Falls du Telemetrie-Daten direkt in der Windows PowerShell / Konsole analysieren möchtest:
+If you prefer inspecting telemetry in the Windows Terminal / PowerShell:
 
 ```powershell
-# Live-Terminal Monitor mit farbigen ANSI-Tabellen
+# Live terminal monitor with colored ANSI tables
 python debug_monitor.py
 
-# Data-Mining Engine mit SQLite Speicherung
+# Data-mining engine with persistent SQLite storage
 python live_monitor.py
 ```
 
 ---
 
-## ⚙️ Konfiguration & Umgebungsvariablen
+## ⚙️ Configuration & Environment Variables
 
-Das Dashboard funktioniert **Out-of-the-Box** ohne manuelle Konfiguration. Für besondere Setups stehen folgende optionale Umgebungsvariablen zur Verfügung:
+The dashboard works out-of-the-box with automatic discovery. For custom installations, the following environment variables can be set:
 
-| Variable | Beschreibung | Standardwert |
+| Variable | Description | Default |
 | :--- | :--- | :--- |
-| `PORT` | Webserver-Port | `3000` |
-| `TF3_STDOUT_PATH` | Manuell definierter Pfad zur `stdout.txt` der TF3 Engine | *Automatische Erkennung (GSE Saves / Steam / Docs)* |
-| `TF3_MOD_DIR` | Manuell definierter Mod-Zielpfad für den Deployer | *Automatische Erkennung* |
+| `PORT` | Web server listening port | `3000` |
+| `TF3_STDOUT_PATH` | Explicit path to the game engine's `stdout.txt` | *Auto-detected (GSE Saves / Steam / Documents)* |
+| `TF3_MOD_DIR` | Explicit mod target path for `create_telemetry_mod.py` | *Auto-detected* |
 
 ---
 
-## 📦 Enthaltene Mods & Credits
+## 📦 Companion Mods & Attribution
 
-* **`tf3_telemetry`** *(Eigene Entwicklung)*:
-  * Nativer C++ Hook und Datenschnittstelle für Transport Fever 3.
-  * Entwickelt von **pono1012**.
-  * Lizenz: [MIT](LICENSE).
+* **`tf3_telemetry`** *(Original)*:
+  * In-game engine hook and telemetry streamer for Transport Fever 3.
+  * Developed by **pono1012**.
+  * License: [MIT](LICENSE).
 
-* **`auto_line_namer`** *(Fork / Anpassung)*:
-  * Basiert auf dem beliebten Mod von **Dave W (BeautifulCheez)** (mod.io ID `6414403`) und **Erkan Ercan**.
-  * **Anpassung:** Städtenamen wurden an den Anfang des Schemas gestellt (`{townNames} - ...`), damit bei alphabetischer Sortierung im Spiel alle Linien derselben Stadt übersichtlich gruppiert sind.
-  * Lizenz: MIT License (siehe [`companion-mod/auto_line_namer/LICENSE`](companion-mod/auto_line_namer/LICENSE)).
+* **`auto_line_namer`** *(Fork / Adaptation)*:
+  * Based on the original mod for Transport Fever 3 by **Dave W (BeautifulCheez)** (mod.io ID `6414403`), which originated from the TF2 mod by **Erkan Ercan**.
+  * **Enhancement:** Town names are prepended to line names (`{townNames} - ...`), allowing alphabetical sorting in the game's Line Manager to cluster all lines belonging to the same city together.
+  * License: MIT License (see [`companion-mod/auto_line_namer/LICENSE`](companion-mod/auto_line_namer/LICENSE)).
 
 ---
 
-## 🤝 Beitragen & Lizenz
+<br/>
 
-Beiträge, Fehlerberichte und Feature-Vorschläge sind herzlich willkommen! 
-Erstelle gerne ein [Issue](https://github.com/pono1012/TF3_Telemetry/issues) oder sende einen Pull Request.
+<div id="-deutsche-kurzanleitung">
 
-Dieses Projekt steht unter der **[MIT Lizenz](LICENSE)**.
+## 🇩🇪 Deutsche Kurzanleitung
+
+### Was ist die TF3 Telemetrie Suite?
+Ein modernes Live-Dashboard für Transport Fever 3, das Fahrzeug-, Linien-, Wartungs- und Finanzdaten in Echtzeit ohne Performance-Verlust aus dem Spiel ausliest und im Browser oder auf dem Tablet visualisiert.
+
+### Schnellstart in 2 Schritten:
+1. **Mod installieren:** Doppelklick auf [`install_mod.bat`](install_mod.bat) oder den Ordner [`companion-mod/tf3_telemetry`](companion-mod/tf3_telemetry) in dein Transport Fever 3 `mods/`-Verzeichnis kopieren. Im Spielstand aktivieren.
+2. **Dashboard starten:** Doppelklick auf [`start_cockpit.bat`](start_cockpit.bat). Das Dashboard öffnet sich auf `http://localhost:3000`.
+3. **Tablet / Handy:** Oben rechts auf **"Tablet / Mobil"** klicken und den QR-Code mit der Handykamera scannen (im selben WLAN).
+
+</div>
+
+---
+
+## 🤝 Contributing & License
+
+Contributions, issues, and feature requests are very welcome! Feel free to open an [Issue](https://github.com/pono1012/TF3_Telemetry/issues) or submit a Pull Request.
+
+This project is licensed under the **[MIT License](LICENSE)**.

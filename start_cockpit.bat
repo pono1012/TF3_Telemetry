@@ -1,11 +1,12 @@
 @echo off
-title Transport Fever 3 Telemetrie Dashboard
+title Transport Fever 3 Telemetry Dashboard
 cd /d "%~dp0"
 echo ============================================================
-echo   TRANSPORT FEVER 3 — LIVE TELEMETRIE & COCKPIT SERVER
+echo   TRANSPORT FEVER 3 — LIVE TELEMETRY ^& COCKPIT SERVER
 echo ============================================================
 echo.
-echo Starte Web-Dashboard auf http://localhost:3000 ...
+echo Launching Web Cockpit Dashboard on http://localhost:3000 ...
+echo (Starte Web-Dashboard auf http://localhost:3000 ...)
 echo.
 start http://localhost:3000
 node server.js
