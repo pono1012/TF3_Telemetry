@@ -4,6 +4,7 @@
 
 **Real-time telemetry, fleet operations monitoring, and financial analytics for Transport Fever 3 directly hooked into the C++ game engine.**
 
+[![Release](https://img.shields.io/github/v/release/pono1012/TF3_Telemetry?color=blue)](https://github.com/pono1012/TF3_Telemetry/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Transport Fever 3](https://img.shields.io/badge/Game-Transport%20Fever%203-orange.svg)](https://www.transportfever2.com)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
