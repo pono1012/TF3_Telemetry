@@ -1,0 +1,58 @@
+# ============================================================
+# Python & Virtual Environments
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.pytest_cache/
+.venv/
+env/
+venv/
+
+# ============================================================
+# Node.js & Dependencies
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json.bak
+
+# ============================================================
+# Live Telemetry, Dumps & Databases (User-specific / Heavy files)
+# ============================================================
+telemetry_data.sqlite
+telemetry_data.sqlite-journal
+telemetry_data.sqlite-wal
+telemetry_data.sqlite-shm
+*.sqlite
+*.sqlite3
+telemetry_history.json
+parsed_live_telemetry.json
+live_telemetry.json
+reset.flag
+stdout.txt
+debug/old_*.png
+
+# ============================================================
+# Secrets, Environment & Local Configuration
+# ============================================================
+.env
+.env.local
+.env.*.local
+*.local
+date_config.json.bak
+
+# ============================================================
+# OS & IDE Files
+# ============================================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+Thumbs.db
+Desktop.ini
+.DS_Store

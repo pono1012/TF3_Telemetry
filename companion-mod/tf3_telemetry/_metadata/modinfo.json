@@ -1,0 +1,17 @@
+{
+    "authors": [
+        {
+            "name": "pono1012",
+            "role": "CREATOR"
+        }
+    ],
+    "description": "Transport Fever 3 Live Telemetrie & Analytics Cockpit Mod. Exportiert hochpräzise Fahrzeug-, Linien- und Finanzdaten in Echtzeit für das externe Dashboard.",
+    "name": "TF3 Live Telemetrie & Cockpit",
+    "summary": "Live Flotten-, Linien- und Finanz-Telemetrie für Transport Fever 3",
+    "tags": [
+        "Script Mod",
+        "Tool",
+        "UI"
+    ],
+    "url": "https://github.com/pono1012/TF3_Telemetry"
+}

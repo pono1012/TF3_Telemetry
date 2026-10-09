@@ -1,0 +1,38 @@
+{
+  "name": "tf3-telemetry-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time Telemetry, Fleet Cockpit & Analytics Dashboard for Transport Fever 3",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dashboard": "node server.js",
+    "monitor": "python live_monitor.py",
+    "debug-cli": "python debug_monitor.py"
+  },
+  "keywords": [
+    "transport-fever-3",
+    "tf3",
+    "telemetry",
+    "cockpit",
+    "dashboard",
+    "fleet-management",
+    "real-time",
+    "analytics"
+  ],
+  "author": "pono1012",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pono1012/TF3_Telemetry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pono1012/TF3_Telemetry/issues"
+  },
+  "homepage": "https://github.com/pono1012/TF3_Telemetry#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "qrcode": "^1.5.4",
+    "ws": "^8.22.0"
+  }
+}

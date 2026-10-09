@@ -1,0 +1,21 @@
+{
+    "autoActivate": true,
+    "cosmetic": true,
+    "dependencies": null,
+    "incompatibilities": null,
+    "modId": "tf3_telemetry_1",
+    "options": null,
+    "params": null,
+    "postRunScript": {
+        "fileName": ""
+    },
+    "preRunScript": {
+        "fileName": ""
+    },
+    "revision": 5,
+    "runScript": {
+        "fileName": "tf3_telemetry_1::/mod.script@runFn"
+    },
+    "severityAdd": "None",
+    "severityRemove": "None"
+}

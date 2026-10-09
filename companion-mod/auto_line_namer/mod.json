@@ -1,0 +1,716 @@
+{
+  "dependencies": null,
+  "incompatibilities": null,
+  "modId": "auto_line_namer_1",
+  "options": null,
+  "params": [
+    {
+      "defaultIndex": 0,
+      "key": "aln.convention",
+      "name": "Naming Convention",
+      "tooltip": "How Auto Line Namer builds line names.\nCustom uses the convention in auto_line_namer/aln_config.lua.",
+      "uiType": "ComboBox",
+      "values": [
+        "Spr-She - Bus Passengers-IC-1",
+        "Spr-She - Bus - Passengers IC",
+        "Spr-She: Bus (1) IC",
+        "Custom (config file)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.townNames",
+      "name": "Town Names",
+      "tooltip": "Short uses the first three letters of each word (Springfield -> Spr).",
+      "uiType": "ComboBox",
+      "values": [
+        "Short",
+        "Full"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.stopNames",
+      "name": "Stop Names",
+      "tooltip": "What the line is named after.\nTowns: the towns it connects.\nStations: its stations' names.\nIndustries: the industry each stop serves, or the station name where it serves none.\nShort/Full from Town Names applies to all three.",
+      "uiType": "ComboBox",
+      "values": [
+        "Towns (Springfield)",
+        "Stations (Springfield Port)",
+        "Industries (Oil Refinery)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargoNames",
+      "name": "Cargo Names",
+      "tooltip": "How cargo is written in line names. Short uses the first three letters of each word; Code uses a fixed 3-letter code. Individual cargo can be overridden in the advanced settings below.",
+      "uiType": "ComboBox",
+      "values": [
+        "Full (Passengers)",
+        "Short (Pas)",
+        "Code (PAX)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 1,
+      "key": "aln.autoUpdate",
+      "name": "Auto Update",
+      "tooltip": "How often ALL lines are re-checked and renamed, including existing lines and lines you renamed yourself (unless their name starts with Cst).\nOff: only new lines (and lines you rename to r or reload) get an auto name; your own names are never changed.",
+      "uiType": "ComboBox",
+      "values": [
+        "Off",
+        "Every minute",
+        "Every 2 minutes",
+        "Every 5 minutes",
+        "Every 10 minutes"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.numberDigits",
+      "name": "Line Number Digits",
+      "tooltip": "How many digits {lineNumber} uses, padded with zeros: 1 gives 1, 2, 3; 3 gives 001, 002, 003.",
+      "uiType": "ComboBox",
+      "values": [
+        "1 (1, 2, 3)",
+        "2 (01, 02, 03)",
+        "3 (001, 002, 003)",
+        "4 (0001, 0002, 0003)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.transportLabels",
+      "name": "Transport Labels",
+      "tooltip": "Short: Bus, RC, TP, TC, HE. Long: Road - Bus, Road - Truck, Rail, Air - Helicopter and so on. Labels you changed in aln_config.lua are kept either way.",
+      "uiType": "ComboBox",
+      "values": [
+        "Short (Bus, RC, TP)",
+        "Long (Road - Bus, Rail)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargoStopNames",
+      "name": "Cargo Stop Names",
+      "tooltip": "What cargo lines are named after. Same as Stop Names, or Towns, Stations or Industries for cargo lines only, e.g. towns for passenger lines and industries for cargo.",
+      "uiType": "ComboBox",
+      "values": [
+        "Same as Stop Names",
+        "Towns",
+        "Stations",
+        "Industries"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargoPlaces",
+      "name": "Cargo Lines Show",
+      "tooltip": "First and last stop (e.g. Mine-Steel Mill), or only the delivery stop, the line's last stop (e.g. Steel Mill).",
+      "uiType": "ComboBox",
+      "values": [
+        "First and last stop",
+        "Delivery stop only"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.advancedSeparator",
+      "name": "Advanced settings (optional)",
+      "tooltip": "Per-cargo name overrides. Optional; leave them on Default to ignore them.",
+      "uiType": "Button",
+      "values": [
+        "Cargo name overrides below, can be ignored"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.beverages",
+      "name": "Cargo: Beverages",
+      "tooltip": "How Beverages is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Beverages)",
+        "Short (Bev)",
+        "Code (BEV)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.books",
+      "name": "Cargo: Books",
+      "tooltip": "How Books is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Books)",
+        "Short (Boo)",
+        "Code (BKS)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.bricks",
+      "name": "Cargo: Bricks",
+      "tooltip": "How Bricks is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Bricks)",
+        "Short (Bri)",
+        "Code (BRK)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.tinned_food",
+      "name": "Cargo: Canned Food",
+      "tooltip": "How Canned Food is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Canned Food)",
+        "Short (CanFoo)",
+        "Code (CAN)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.cement",
+      "name": "Cargo: Cement",
+      "tooltip": "How Cement is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Cement)",
+        "Short (Cem)",
+        "Code (CEM)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.chemicals",
+      "name": "Cargo: Chemicals",
+      "tooltip": "How Chemicals is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Chemicals)",
+        "Short (Che)",
+        "Code (CHM)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.clay",
+      "name": "Cargo: Clay",
+      "tooltip": "How Clay is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Clay)",
+        "Short (Cla)",
+        "Code (CLY)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.clothes",
+      "name": "Cargo: Clothes",
+      "tooltip": "How Clothes is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Clothes)",
+        "Short (Clo)",
+        "Code (CLO)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.coal",
+      "name": "Cargo: Coal",
+      "tooltip": "How Coal is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Coal)",
+        "Short (Coa)",
+        "Code (COA)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.crude_oil",
+      "name": "Cargo: Crude Oil",
+      "tooltip": "How Crude Oil is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Crude Oil)",
+        "Short (CruOil)",
+        "Code (OIL)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.dyes",
+      "name": "Cargo: Dyes",
+      "tooltip": "How Dyes is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Dyes)",
+        "Short (Dye)",
+        "Code (DYE)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.fabric",
+      "name": "Cargo: Fabric",
+      "tooltip": "How Fabric is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Fabric)",
+        "Short (Fab)",
+        "Code (FAB)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.fertilizer",
+      "name": "Cargo: Fertilizer",
+      "tooltip": "How Fertilizer is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Fertilizer)",
+        "Short (Fer)",
+        "Code (FRT)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.fish",
+      "name": "Cargo: Fish",
+      "tooltip": "How Fish is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Fish)",
+        "Short (Fis)",
+        "Code (FSH)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.fuel",
+      "name": "Cargo: Fuel",
+      "tooltip": "How Fuel is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Fuel)",
+        "Short (Fue)",
+        "Code (FUL)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.furniture",
+      "name": "Cargo: Furniture",
+      "tooltip": "How Furniture is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Furniture)",
+        "Short (Fur)",
+        "Code (FUR)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.glass",
+      "name": "Cargo: Glass",
+      "tooltip": "How Glass is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Glass)",
+        "Short (Gla)",
+        "Code (GLS)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.grain",
+      "name": "Cargo: Grain",
+      "tooltip": "How Grain is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Grain)",
+        "Short (Gra)",
+        "Code (GRN)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.iron_ore",
+      "name": "Cargo: Iron Ore",
+      "tooltip": "How Iron Ore is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Iron Ore)",
+        "Short (IroOre)",
+        "Code (ORE)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.logs",
+      "name": "Cargo: Logs",
+      "tooltip": "How Logs is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Logs)",
+        "Short (Log)",
+        "Code (LOG)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.machines",
+      "name": "Cargo: Machines",
+      "tooltip": "How Machines is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Machines)",
+        "Short (Mac)",
+        "Code (MCH)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.meat",
+      "name": "Cargo: Meat",
+      "tooltip": "How Meat is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Meat)",
+        "Short (Mea)",
+        "Code (MEA)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.paper",
+      "name": "Cargo: Paper",
+      "tooltip": "How Paper is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Paper)",
+        "Short (Pap)",
+        "Code (PPR)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.passengers",
+      "name": "Cargo: Passengers",
+      "tooltip": "How Passengers is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Passengers)",
+        "Short (Pas)",
+        "Code (PAX)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.planks",
+      "name": "Cargo: Planks",
+      "tooltip": "How Planks is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Planks)",
+        "Short (Pla)",
+        "Code (PLK)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.plastic",
+      "name": "Cargo: Plastic",
+      "tooltip": "How Plastic is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Plastic)",
+        "Short (Pla)",
+        "Code (PLS)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.rubber",
+      "name": "Cargo: Rubber",
+      "tooltip": "How Rubber is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Rubber)",
+        "Short (Rub)",
+        "Code (RUB)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.sand",
+      "name": "Cargo: Sand",
+      "tooltip": "How Sand is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Sand)",
+        "Short (San)",
+        "Code (SND)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.sawdust",
+      "name": "Cargo: Sawdust",
+      "tooltip": "How Sawdust is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Sawdust)",
+        "Short (Saw)",
+        "Code (SWD)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.sheet_metal",
+      "name": "Cargo: Sheet Metal",
+      "tooltip": "How Sheet Metal is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Sheet Metal)",
+        "Short (SheMet)",
+        "Code (SHM)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.steel",
+      "name": "Cargo: Steel",
+      "tooltip": "How Steel is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Steel)",
+        "Short (Ste)",
+        "Code (STL)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.stone",
+      "name": "Cargo: Stone",
+      "tooltip": "How Stone is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Stone)",
+        "Short (Sto)",
+        "Code (STN)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.tires",
+      "name": "Cargo: Tires",
+      "tooltip": "How Tires is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Tires)",
+        "Short (Tir)",
+        "Code (TYR)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.tools",
+      "name": "Cargo: Tools",
+      "tooltip": "How Tools is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Tools)",
+        "Short (Too)",
+        "Code (TLS)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.vegetables",
+      "name": "Cargo: Vegetables",
+      "tooltip": "How Vegetables is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Vegetables)",
+        "Short (Veg)",
+        "Code (VEG)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.vehicles",
+      "name": "Cargo: Vehicles",
+      "tooltip": "How Vehicles is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Vehicles)",
+        "Short (Veh)",
+        "Code (VEH)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    },
+    {
+      "defaultIndex": 0,
+      "key": "aln.cargo.wool",
+      "name": "Cargo: Wool",
+      "tooltip": "How Wool is written in line names. Default follows the Cargo Names setting above.",
+      "uiType": "ComboBox",
+      "values": [
+        "Default (follows Cargo Names)",
+        "Full (Wool)",
+        "Short (Woo)",
+        "Code (WOL)"
+      ],
+      "yearFrom": 0,
+      "yearTo": 0
+    }
+  ],
+  "postRunScript": {
+    "fileName": ""
+  },
+  "preRunScript": {
+    "fileName": ""
+  },
+  "revision": 5,
+  "runScript": {
+    "fileName": ""
+  },
+  "severityAdd": "None",
+  "severityRemove": "None",
+  "cosmetic": true
+}

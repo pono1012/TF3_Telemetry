@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TF3 Telemetry • Linien & Finanzen</title>
+  <meta name="description" content="Echtzeit-Telemetrie, Linienübersicht und Finanz-Analyse für Transport Fever 3.">
+
+  <!-- Core & Component Styles -->
+  <link rel="stylesheet" href="css/main.css?v=3.8">
+  <link rel="stylesheet" href="css/components.css?v=3.9">
+  <link rel="stylesheet" href="css/tablet.css?v=3.0">
+
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Cockpit Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo" style="box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+        </div>
+        <div class="brand-title-group">
+          <h1>
+            <span data-i18n="appTitle">TF3 Telemetry</span>
+            <span class="brand-badge" style="background: rgba(6, 182, 212, 0.2); border: 1px solid rgba(6, 182, 212, 0.4); color: var(--accent-cyan);">Live Dashboard</span>
+          </h1>
+          <div class="brand-subtitle" data-i18n="appSubtitle">Linien- & Finanz-Übersicht</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Language Switcher (EN primary / DE) -->
+        <div class="lang-toggle-wrap" title="Toggle UI Language (English / Deutsch)">
+          <button class="lang-btn active" id="btnLangEN" onclick="window.dashboard.setLanguage('en')">EN</button>
+          <button class="lang-btn" id="btnLangDE" onclick="window.dashboard.setLanguage('de')">DE</button>
+        </div>
+
+        <!-- Live Connection Status Pill -->
+        <div class="game-status-pill" id="gameStatusIndicator" title="Engine Link Status">
+          <span class="radar-ping" id="radarPingDot"></span>
+          <span class="status-label" data-i18n="statusLabel">SYS:</span>
+          <span class="status-val" id="statusValText">TF3 LIVE</span>
+        </div>
+
+        <!-- In-game Calendar Date & Play Duration Badge -->
+        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 6px 14px; font-family: var(--font-mono); font-size: 0.85rem; color: #ffffff; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;" title="In-Game Calendar Date & Time. Click to synchronize." onclick="window.dashboard.openDateCalibration()">
+          <span style="color: var(--accent-cyan); display: flex; align-items: center; gap: 4px;">
+            <span>📅</span> <span id="headerGameDate" style="font-weight: 700; color: #fff;">--.--.----</span>
+          </span>
+          <span style="color: rgba(255, 255, 255, 0.2);">|</span>
+          <span style="color: var(--text-dim); display: flex; align-items: center; gap: 4px; font-size: 0.78rem;">
+            <span>⏱️</span> <span id="headerPlayDuration">--h --m</span>
+          </span>
+        </div>
+
+        <!-- Network Health Score Badge -->
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 6px 12px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--status-emerald); display: flex; align-items: center; gap: 6px;" id="networkHealthBadge" title="Network Health Score">
+          <span>💚</span>
+          <span id="networkHealthText">100% HEALTH</span>
+        </div>
+
+        <!-- Session Reset Button -->
+        <button class="btn btn-glass" onclick="window.dashboard.resetSession()" title="Reset Session Statistics">
+          <span>🔄</span>
+          <span data-i18n="resetBtn">Reset</span>
+        </button>
+
+        <!-- Tablet / Mobile QR Button -->
+        <button class="btn btn-tablet" onclick="window.dashboard.openQrModal()" title="Open on Mobile / Tablet">
+          <span>📱</span>
+          <span data-i18n="mobileBtn">Mobile Stream</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Horizon & Averaging Mode Bar (Multi-Horizon Analysis) -->
+    <div class="averaging-bar" id="averagingBar">
+      <div class="averaging-bar-left">
+        <span class="averaging-bar-label">📊 <strong>Berechnungs-Horizont:</strong></span>
+        <div class="horizon-pill-group" id="globalHorizonSelector">
+          <button class="horizon-pill active" data-horizon="all" onclick="window.dashboard.setGlobalHorizon('all')" title="Geglätteter Gesamtdurchschnitt über alle aufgezeichneten Tage (seit 1994)">🌐 Gesamt (Alle Tage)</button>
+          <button class="horizon-pill" data-horizon="year" onclick="window.dashboard.setGlobalHorizon('year')" title="Durchschnitt der letzten 365 Ingame-Tage">🗓️ 1 Ingame-Jahr</button>
+          <button class="horizon-pill" data-horizon="month" onclick="window.dashboard.setGlobalHorizon('month')" title="Durchschnitt der letzten 30 Ingame-Tage">📅 1 Ingame-Monat</button>
+          <button class="horizon-pill" data-horizon="week" onclick="window.dashboard.setGlobalHorizon('week')" title="Durchschnitt der letzten 7 Ingame-Tage">📆 7 Tage</button>
+          <button class="horizon-pill" data-horizon="live" onclick="window.dashboard.setGlobalHorizon('live')" title="Reine 60-Sekunden Echtzeit-Rate">⚡ Live (60s)</button>
+        </div>
+      </div>
+      <div class="averaging-bar-right">
+        <span class="averaging-bar-label">Einheit:</span>
+        <div class="unit-pill-group" id="globalUnitSelector">
+          <button class="unit-pill active" data-unit="year" onclick="window.dashboard.setGlobalUnit('year')">/ Ingame-Jahr</button>
+          <button class="unit-pill" data-unit="month" onclick="window.dashboard.setGlobalUnit('month')">/ Monat</button>
+          <button class="unit-pill" data-unit="day" onclick="window.dashboard.setGlobalUnit('day')">/ Tag</button>
+          <button class="unit-pill" data-unit="min" onclick="window.dashboard.setGlobalUnit('min')">/ Min</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Macro KPI Grid (Unified 6-Card Executive Cockpit Bar) -->
+    <section class="kpi-grid">
+      <!-- 1. Kontostand & Kasse -->
+      <div class="kpi-card" style="--card-accent: #38bdf8; cursor: pointer;" onclick="window.dashboard.switchTab('tab-finances')">
+        <div class="kpi-header">
+          <span class="kpi-title" data-i18n="treasuryTitle">Kontostand & Kasse</span>
+          <div class="kpi-icon" style="color: #38bdf8;">🏦</div>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-value" id="kpiBankBalance">$0</span>
+          <span class="kpi-trend" id="kpiBalanceTrend" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3);">--</span>
+        </div>
+        <div class="kpi-subtext" id="kpiBalanceSub">Rate: $0/m • Schulden: $0</div>
+      </div>
+
+      <!-- 2. Operativer Netto-Saldo ($/m) -->
+      <div class="kpi-card" style="--card-accent: var(--status-emerald);">
+        <div class="kpi-header">
+          <span class="kpi-title" id="kpiNettoTitle" data-i18n="nettoTitle">Operativer Netto-Saldo</span>
+          <div class="kpi-icon" style="color: var(--status-emerald);">💰</div>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-value" id="kpiNettoMin" style="color: var(--status-emerald);">+$0/Jahr</span>
+          <span class="kpi-trend trend-up" id="kpiProfitMargin">--% Marge</span>
+        </div>
+        <div class="kpi-subtext" id="kpiNettoSub">Basis: Gesamte Aufzeichnung</div>
+      </div>
+
+      <!-- 3. Passagiere ÖPNV Live Status -->
+      <div class="kpi-card" style="--card-accent: var(--accent-cyan); cursor: pointer;" onclick="window.dashboard.switchTab('tab-table'); window.dashboard.setTableCategory('ROAD_PERSON');">
+        <div class="kpi-header">
+          <span class="kpi-title">Passagiere (ÖPNV)</span>
+          <div class="kpi-icon" style="color: var(--accent-cyan);">👥</div>
+        </div>
+        <div class="kpi-body" style="align-items: baseline;">
+          <span class="kpi-value" id="kpiPaxUtil" style="color: var(--accent-cyan);">0%</span>
+          <span class="kpi-unit" id="kpiPaxLoadCap" style="font-family: var(--font-mono); font-size: 0.85rem; color: #fff;">0 / 0 Pax</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.08); height: 5px; border-radius: 3px; overflow: hidden; margin: 6px 0;">
+          <div id="kpiPaxBar" style="background: var(--accent-cyan); height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <div class="kpi-subtext" id="kpiPaxWaiting">Wartend: 0 Pax an Terminals</div>
+      </div>
+
+      <!-- 4. Güter & Fracht Cargo Live Status -->
+      <div class="kpi-card" style="--card-accent: var(--accent-purple); cursor: pointer;" onclick="window.dashboard.switchTab('tab-table'); window.dashboard.setTableCategory('ROAD_CARGO');">
+        <div class="kpi-header">
+          <span class="kpi-title">Güter & Fracht (Cargo)</span>
+          <div class="kpi-icon" style="color: #d8b4fe;">📦</div>
+        </div>
+        <div class="kpi-body" style="align-items: baseline;">
+          <span class="kpi-value" id="kpiCargoUtil" style="color: #d8b4fe;">0%</span>
+          <span class="kpi-unit" id="kpiCargoLoadCap" style="font-family: var(--font-mono); font-size: 0.85rem; color: #fff;">0 / 0 Fracht</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.08); height: 5px; border-radius: 3px; overflow: hidden; margin: 6px 0;">
+          <div id="kpiCargoBar" style="background: var(--accent-purple); height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <div class="kpi-subtext" id="kpiCargoWaiting">Wartend: 0 Fracht in Lagern</div>
+      </div>
+
+      <!-- 5. Flotten-Betriebskosten -->
+      <div class="kpi-card" style="--card-accent: var(--status-rose);">
+        <div class="kpi-header">
+          <span class="kpi-title" data-i18n="costsTitle">Flotten-Betriebskosten</span>
+          <div class="kpi-icon" style="color: var(--status-rose);">📉</div>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-value" id="kpiCostsMin" style="color: var(--status-rose);">$0/m</span>
+          <span class="kpi-unit" id="kpiCostsYear">$0/yr</span>
+        </div>
+        <div class="kpi-subtext" id="kpiPenaltyWasted">⚠️ $0 Alterungs-Strafen</div>
+      </div>
+
+      <!-- 6. Kredit & Zinsen -->
+      <div class="kpi-card" style="--card-accent: #fbbf24; cursor: pointer;" onclick="window.dashboard.switchTab('tab-finances')">
+        <div class="kpi-header">
+          <span class="kpi-title">Kreditsumme & Zinsen</span>
+          <div class="kpi-icon" style="color: #fbbf24;">💳</div>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-value" id="kpiLoanVal" style="color: #fbbf24;">$0</span>
+          <span class="kpi-unit" id="kpiInterestVal" style="color: #fde68a;">$0/M</span>
+        </div>
+        <div class="kpi-subtext" id="kpiLoanSub">Effektivzins: 1.5% p.a.</div>
+      </div>
+    </section>
+
+    <!-- Main Navigation View Tabs -->
+    <nav class="view-tabs">
+      <!-- 1. EXECUTIVE DASHBOARD (DEFAULT ACTIVE VIEW) -->
+      <button class="tab-btn active" data-tab="tab-dashboard">
+        <span>⚡</span>
+        <span data-i18n="tabDashboard">Executive Dashboard</span>
+        <span class="tab-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--status-emerald);">Live</span>
+      </button>
+
+      <!-- 2. ALLE LINIEN -->
+      <button class="tab-btn" data-tab="tab-table">
+        <span>📋</span>
+        <span data-i18n="tabFleet">Alle Linien</span>
+        <span class="tab-badge" id="badgeAllLines" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">0</span>
+      </button>
+
+      <!-- 3. FINANZEN -->
+      <button class="tab-btn" data-tab="tab-finances">
+        <span>🏦</span>
+        <span data-i18n="tabFinances">Finanzen</span>
+        <span class="tab-badge" id="badgeFinanceTrend" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">--/m</span>
+      </button>
+
+      <!-- 4. FAHRZEUG-BERATER -->
+      <button class="tab-btn" data-tab="tab-patterns">
+        <span>🧠</span>
+        <span data-i18n="tabPatterns">Fahrzeug-Berater</span>
+        <span class="tab-badge badge-danger" id="badgePatternCount">0</span>
+      </button>
+
+      <!-- 5. DIAGRAMME -->
+      <button class="tab-btn" data-tab="tab-wall-charts">
+        <span>📈</span>
+        <span data-i18n="tabWall">Diagramme</span>
+        <span class="tab-badge" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe;">6 Charts</span>
+      </button>
+
+      <!-- 6. LINIEN-DETAILS -->
+      <button class="tab-btn" data-tab="tab-inspector">
+        <span>🔬</span>
+        <span data-i18n="tabInspector">Linien-Details</span>
+      </button>
+    </nav>
+
+
+    <!-- ==================================================================== -->
+    <!-- TAB 1: EXECUTIVE DASHBOARD (PRIMARY / FIRST VIEW)                    -->
+    <!-- ==================================================================== -->
+    <main class="tab-panel active" id="tab-dashboard">
+      
+      <!-- 1. EXECUTIVE TRI-CHART SECTION (ALLE GRAPHEN MIT SPIELDATUM!) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        
+        <!-- Graph 1: Kontostand & Liquidität -->
+        <div class="panel-box" style="padding: 16px;">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title">
+              <span>🏦</span>
+              <span>Kontostand & Liquidität</span>
+            </div>
+            <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;" id="badgeCockpitBalance">$0</span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); margin-bottom: 6px;">Verlauf nach Spiel-Kalendertag (stoppt exakt bei Pause)</div>
+          <div style="height: 180px; width: 100%;">
+            <canvas id="chartCockpitBalance"></canvas>
+          </div>
+        </div>
+
+        <!-- Graph 2: Kreditbestand & Zinsen (1.5% p.a.) -->
+        <div class="panel-box" style="padding: 16px;">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title">
+              <span>💳</span>
+              <span>Kreditsumme & Zinslast</span>
+            </div>
+            <span class="badge" style="background: rgba(244, 63, 94, 0.15); color: var(--status-rose);" id="badgeCockpitLoan">$0 (Zins: $0/M)</span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); margin-bottom: 6px;">Darlehensbestand & monatliche Zinsen über Spieldatum</div>
+          <div style="height: 180px; width: 100%;">
+            <canvas id="chartCockpitLoan"></canvas>
+          </div>
+        </div>
+
+        <!-- Graph 3: Alle Linien Auslastung -->
+        <div class="panel-box" style="padding: 16px;">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title">
+              <span>📊</span>
+              <span>Netzwerk-Auslastung (%)</span>
+            </div>
+            <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: #d8b4fe;" id="badgeCockpitUtil">0%</span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); margin-bottom: 6px;">Flottenauslastung nach Spiel-Kalendertag</div>
+          <div style="height: 180px; width: 100%;">
+            <canvas id="chartCockpitUtil"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 2. FLOTTEN-TRANSFER-VORSCHLÄGE (FAHRZEUGE VERSCHIEBEN FÜR $0 NEUKAUF!) -->
+      <div class="panel-box" style="margin-bottom: 20px; border-left: 4px solid var(--status-emerald);">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>💡</span>
+            <span>Smarte Fahrzeug-Verschiebungen ($0 Investition)</span>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--status-emerald); font-weight: 700;">Effizienz-Optimierer</span>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+          Erkennt Überkapazitäten auf schwachen Linien (&lt;20% Auslastung) und schlägt gezielte Verschiebungen auf überfüllte Linien mit Stau vor.
+        </div>
+        <div id="transferSuggestionsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
+          <div style="color: var(--text-dim); padding: 16px; font-size: 0.85rem;">Prüfe Fahrzeugverschiebungen...</div>
+        </div>
+      </div>
+
+      <!-- 3. TOP & FLOP LINIEN -->
+      <div class="cockpit-grid">
+        <!-- Top 5 Earners -->
+        <div class="panel-box">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>🏆</span>
+              <span>Top 5 Profitable Linien</span>
+            </div>
+            <span style="font-size: 0.78rem; color: var(--status-emerald);">Höchster Netto-Cashflow</span>
+          </div>
+          <div class="rank-list" id="listTopEarners">
+            <div style="color: var(--text-dim); text-align: center; padding: 20px;">Warte auf Daten...</div>
+          </div>
+        </div>
+
+        <!-- Top 5 Losers / Bleeders -->
+        <div class="panel-box">
+          <div class="panel-header">
+            <div class="panel-title" style="color: var(--status-rose);">
+              <span>💸</span>
+              <span>Top 5 Verlust-Linien</span>
+            </div>
+            <span style="font-size: 0.78rem; color: var(--status-rose);">Höchstes Defizit</span>
+          </div>
+          <div class="rank-list" id="listTopLosers">
+            <div style="color: var(--text-dim); text-align: center; padding: 20px;">Warte auf Daten...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. OPERATIVE WARNUNGEN & ENGPÄSSE -->
+      <div class="panel-box" style="margin-top: 20px;">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+          <div class="panel-title" style="color: var(--status-amber);">
+            <span>⚠️</span>
+            <span>Operative Warnungen & Engpässe</span>
+            <span class="tab-badge badge-danger" id="badgeProblemCount">0</span>
+          </div>
+
+          <!-- Quick Filters: Cargo/Pax and Cities -->
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <div class="mode-toggle-group">
+              <button class="mode-toggle-btn active" id="btnWarnFilterAll" onclick="window.dashboard.setWarningTypeFilter('ALL')">Alle</button>
+              <button class="mode-toggle-btn" id="btnWarnFilterPax" onclick="window.dashboard.setWarningTypeFilter('PAX')">🚌 Passagiere</button>
+              <button class="mode-toggle-btn" id="btnWarnFilterCargo" onclick="window.dashboard.setWarningTypeFilter('CARGO')">🚚 Fracht</button>
+            </div>
+
+            <select id="warnCitySelect" onchange="window.dashboard.setWarningCityFilter(this.value)"
+                    style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); color: #fff; padding: 4px 10px; border-radius: var(--radius-md); font-size: 0.78rem; font-family: var(--font-display); outline: none; cursor: pointer;">
+              <option value="ALL">🏙️ Alle Städte</option>
+            </select>
+          </div>
+        </div>
+        <div class="problem-grid" id="problemLinesContainer">
+          <div style="color: var(--text-dim); text-align: center; padding: 20px; grid-column: 1 / -1;">
+            Alle Routen laufen planmäßig.
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. WARENHÄUSER & STATIONEN STAU-MONITOR (USER REQUIREMENT) -->
+      <div class="panel-box" style="margin-top: 20px;" id="warehouseMonitorSection">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div class="panel-title" style="color: #38bdf8;">
+              <span>🏬</span>
+              <span>Warenhäuser & Stationen Stau-Monitor</span>
+              <span class="tab-badge" id="badgeWarehouseCount" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">0</span>
+            </div>
+            <div style="font-size: 0.74rem; color: var(--text-dim);">
+              Erkennt Überlastung (🔴 Zu klein) und Unterlastung (🟢 Zu groß / kaum Durchsatz) mit rollendem 5m-Durchschnitt
+            </div>
+          </div>
+
+          <!-- Filter buttons for warehouses -->
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <div class="cyber-search" style="padding: 4px 10px;">
+              <span style="font-size: 0.85rem;">🔍</span>
+              <input type="text" id="warehouseSearchInput" placeholder="Station / Stadt suchen..." oninput="window.dashboard.filterWarehouses()" style="font-size: 0.78rem;">
+            </div>
+            <div class="mode-toggle-group">
+              <button class="mode-toggle-btn active" id="btnWhFilterAll" onclick="window.dashboard.setWarehouseFilter('ALL')">Alle</button>
+              <button class="mode-toggle-btn" id="btnWhFilterSmall" onclick="window.dashboard.setWarehouseFilter('OVERFLOW')">🔴 Zu klein</button>
+              <button class="mode-toggle-btn" id="btnWhFilterLarge" onclick="window.dashboard.setWarehouseFilter('UNDERUTILIZED')">🟢 Zu groß</button>
+              <button class="mode-toggle-btn" id="btnWhFilterCargo" onclick="window.dashboard.setWarehouseFilter('CARGO')">📦 Nur Fracht</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto; max-height: 480px; overflow-y: auto;">
+          <table class="telemetry-table" id="warehouseTable" style="font-size: 0.84rem;">
+            <thead style="position: sticky; top: 0; z-index: 5; background: #0c1222;">
+              <tr>
+                <th style="min-width: 170px;">Station / Warenhaus</th>
+                <th style="width: 110px;">Typ</th>
+                <th style="width: 110px; text-align: right;">Live Wartend</th>
+                <th style="width: 110px; text-align: right;">Ø 5m Wartend</th>
+                <th style="width: 160px; text-align: center;">Dimensionierung / Status</th>
+                <th style="min-width: 160px;">Bedienende Linien</th>
+              </tr>
+            </thead>
+            <tbody id="warehouseTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-dim);">Warte auf Stationsdaten...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+
+    <!-- ==================================================================== -->
+    <!-- TAB 2: ALLE LINIEN / OPERATIONS MATRIX                               -->
+    <!-- ==================================================================== -->
+    <main class="tab-panel" id="tab-table">
+
+      <!-- Matrix Box -->
+      <div class="matrix-container">
+        
+        <!-- City Corridor Quick-Pills -->
+        <div class="city-filter-container" id="cityFilterBar" style="padding: 10px 18px; border-bottom: 1px solid var(--border-subtle); background: rgba(10, 15, 28, 0.85);">
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase;" data-i18n="citiesLabel">🏙️ Corridor Cities:</span>
+          <button class="city-pill active" data-city="ALL" onclick="window.dashboard.setCityFilter('ALL')">All</button>
+        </div>
+
+        <!-- Matrix Controls & Filter Toolbar -->
+        <div class="matrix-toolbar">
+          <!-- Cyber Search -->
+          <div class="cyber-search">
+            <span style="color: var(--accent-cyan); font-size: 0.95rem;">🔍</span>
+            <input type="text" id="tableSearchInput" placeholder="Search routes, cargo, towns, vehicles..."
+                   data-i18n-ph="searchPlaceholder" oninput="window.dashboard.filterTable()">
+          </div>
+
+          <!-- Quick Risk & Health Filters -->
+          <div class="filter-group">
+            <button class="filter-pill active" id="filterBtnAll" onclick="window.dashboard.setRiskFilter('ALL')">
+              <span data-i18n="filterAll">All Lines</span>
+            </button>
+            <button class="filter-pill warning" id="filterBtnSwap" onclick="window.dashboard.setRiskFilter('SWAP')">
+              <span>🔄</span> <span data-i18n="filterSwap">Vehicle Swaps</span> <span id="badgeSwapCount" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.72rem; padding: 1px 6px; border-radius: 10px; margin-left: 4px;">0</span>
+            </button>
+            <button class="filter-pill danger" id="filterBtnDeficit" onclick="window.dashboard.setRiskFilter('DEFICIT')">
+              <span>📉</span> <span data-i18n="filterDeficit">Loss Makers</span>
+            </button>
+            <button class="filter-pill warning" id="filterBtnMaint" onclick="window.dashboard.setRiskFilter('MAINT')">
+              <span>🔧</span> <span data-i18n="filterMaint">Old Vehicles</span>
+            </button>
+            <button class="filter-pill warning" id="filterBtnBacklog" onclick="window.dashboard.setRiskFilter('BACKLOG')">
+              <span>📦</span> <span data-i18n="filterBacklog">High Waiting</span>
+            </button>
+            <button class="filter-pill" id="filterBtnGhost" onclick="window.dashboard.setRiskFilter('GHOST')">
+              <span>👻</span> <span data-i18n="filterGhost">Low Load (<20%)</span>
+            </button>
+          </div>
+
+          <!-- Vehicle Advisor Launch Button -->
+          <button class="fleet-advisor-launch-btn" onclick="window.dashboard.openFleetAdvisorModal()">
+            <span>🛠️</span> <span data-i18n="btnFleetAdvisor">Vehicle Advisor</span>
+          </button>
+
+          <!-- Display Mode Toggle (Ø Jahr / Ø Monat / Ø Tag / Live / Gesamt) -->
+          <div class="mode-toggle-group">
+            <button class="mode-toggle-btn active" id="btnTableModeYear" onclick="window.dashboard.setTableMode('year')">
+              <span>👑 Ø Jahr</span>
+            </button>
+            <button class="mode-toggle-btn" id="btnTableModeMonth" onclick="window.dashboard.setTableMode('month')">
+              <span>🗓️ Ø Monat</span>
+            </button>
+            <button class="mode-toggle-btn" id="btnTableModeDay" onclick="window.dashboard.setTableMode('day')">
+              <span>☀️ Ø Tag</span>
+            </button>
+            <button class="mode-toggle-btn" id="btnTableModeLive" onclick="window.dashboard.setTableMode('live')">
+              <span data-i18n="viewLive">⚡ Live</span>
+            </button>
+            <button class="mode-toggle-btn" id="btnTableModeSession" onclick="window.dashboard.setTableMode('session')">
+              <span data-i18n="viewSession">🌐 Gesamt</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Carrier Quick Filters -->
+        <div style="padding: 10px 18px; display: flex; gap: 8px; flex-wrap: wrap; background: rgba(15, 23, 42, 0.4); border-bottom: 1px solid var(--border-subtle);">
+          <button class="cat-pill active" data-cat="ALL" onclick="window.dashboard.setTableCategory('ALL')">🌐 All Carriers</button>
+          <button class="cat-pill" data-cat="ROAD_CARGO" onclick="window.dashboard.setTableCategory('ROAD_CARGO')">🚚 Road Cargo</button>
+          <button class="cat-pill" data-cat="ROAD_PERSON" onclick="window.dashboard.setTableCategory('ROAD_PERSON')">🚌 Passenger / Transit</button>
+          <button class="cat-pill" data-cat="RAIL" onclick="window.dashboard.setTableCategory('RAIL')">🚆 Railway</button>
+          <button class="cat-pill" data-cat="WATER" onclick="window.dashboard.setTableCategory('WATER')">🚢 Maritime / Ships</button>
+          <button class="cat-pill" data-cat="AIR" onclick="window.dashboard.setTableCategory('AIR')">✈️ Aviation</button>
+        </div>
+
+        <!-- Full Matrix Table with In-Table Sparkline Graphs -->
+        <div class="full-table-wrapper" style="max-height: 720px; overflow-y: auto;">
+          <table class="telemetry-table" id="mainTelemetryTable">
+            <thead style="position: sticky; top: 0; z-index: 10; background: #0c1222; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+              <tr>
+                <th style="width: 70px;" onclick="window.dashboard.sortTable('status')">
+                  <span data-i18n="thStatus">Status</span> ⬍
+                </th>
+                <th style="min-width: 170px;" onclick="window.dashboard.sortTable('name')">
+                  <span data-i18n="thLine">Line / Route</span> ⬍
+                </th>
+                <th style="width: 110px;" onclick="window.dashboard.sortTable('vehicleCount')">
+                  <span data-i18n="thCarrier">Type & Fleet</span> ⬍
+                </th>
+                <th style="width: 100px;" onclick="window.dashboard.sortTable('load')">
+                  <span data-i18n="thLoadCap">Load / Capacity</span> ⬍
+                </th>
+                <!-- IN-TABLE UTILIZATION TIME GRAPH (USER REQUIREMENT!) -->
+                <th style="width: 115px;" onclick="window.dashboard.sortTable('avgUtil60s')" id="thMatrixUtil">
+                  <span data-i18n="thUtilGraph">Utilization & Trend</span> ⬍
+                </th>
+                <!-- WAITING (PAX / CARGO AT STOPS) -->
+                <th style="width: 90px;" onclick="window.dashboard.sortTable('totalWaiting')">
+                  <span data-i18n="thBacklog">Waiting</span> ⬍
+                </th>
+                <th style="width: 105px; text-align: right;" onclick="window.dashboard.sortTable('cashflow60s')">
+                  <span data-i18n="thCashflow">Cashflow</span> ⬍
+                </th>
+                <th style="width: 75px;" onclick="window.dashboard.sortTable('frequency')">
+                  <span data-i18n="thFreq">Interval</span> ⬍
+                </th>
+                <th style="width: 110px;" onclick="window.dashboard.sortTable('maintState')">
+                  <span data-i18n="thMaint">Condition & Penalties</span> ⬍
+                </th>
+                <th style="width: 45px; text-align: center;">
+                  <span data-i18n="thInspect">Details</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="telemetryTableBody">
+              <tr>
+                <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-dim);">Connecting to Transport Fever 3 live engine...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+
+
+    <!-- ==================================================================== -->
+    <!-- TAB 2: TREASURY, RUNWAY & IN-GAME ACCOUNTING JOURNAL                 -->
+    <!-- ==================================================================== -->
+    <main class="tab-panel" id="tab-finances">
+      
+      <!-- Critical Runway / Insolvency Countdown Banner (Dynamic) -->
+      <div id="runwayAlertBanner" class="runway-alert-banner" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="font-size: 2rem;">🚨</span>
+          <div>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #fff;" id="runwayBannerTitle">
+              CRITICAL CASH BURN DETECTED
+            </div>
+            <div style="font-size: 0.85rem; color: #fecdd3;" id="runwayBannerSub">
+              At the current burn rate, company treasury will be exhausted in approximately 35 minutes.
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: #fff; background: rgba(244, 63, 94, 0.4); padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.3);" id="runwayCountdownPill">
+            -- MIN
+          </div>
+          <button class="btn btn-primary" onclick="window.dashboard.filterTopBleeders()" style="background: #e11d48; border-color: #f43f5e;">
+            <span>⚡ Fix Bleeders</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Top Treasury Macro Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div class="panel-box" style="background: rgba(14, 21, 37, 0.8);">
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;" data-i18n="treasuryHeading">Liquid Cash Reserves</div>
+          <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: #38bdf8;" id="finBankBalanceVal">$0</div>
+          <div style="margin-top: 6px;" id="finTrendPill">⚪ Balanced</div>
+        </div>
+
+        <div class="panel-box" style="background: rgba(14, 21, 37, 0.8);">
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;" data-i18n="burnRate">Net Change Rate / Min</div>
+          <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono);" id="finRatePerMinVal">$0/m</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;" id="finRatePerHourVal">Projected: $0/h</div>
+        </div>
+
+        <div class="panel-box" style="background: rgba(14, 21, 37, 0.8);">
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;" data-i18n="creditLoan">Bank Debt & Interest</div>
+          <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: #fbbf24;" id="finLoanVal">$0</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;" id="finInterestVal">Interest: $0/yr</div>
+        </div>
+
+        <div class="panel-box" style="background: rgba(14, 21, 37, 0.8);">
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;" data-i18n="ytdEarnings">YTD Fiscal Year Result</div>
+          <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono);" id="finEarningsYearVal">$0</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;" id="finRunwayVal">Liquidity Secure</div>
+        </div>
+      </div>
+
+      <!-- Multi-Horizon Analysis Matrix (Ingame-Zeithorizonte) -->
+      <div class="panel-box" style="margin-bottom: 22px; border-left: 4px solid #38bdf8; background: rgba(15, 23, 42, 0.85);">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 8px;">
+          <div>
+            <div class="panel-title">
+              <span>📊</span>
+              <span>Ingame-Zeithorizonte & Perioden-Durchschnitte</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">
+              Vergleicht das echte Betriebswachstum über verschiedene Ingame-Zeiträume (Tage, Monate, Jahre) bereinigt um Kredite.
+            </div>
+          </div>
+          <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">Kreditbereinigt</span>
+        </div>
+        <div class="horizon-grid" id="financeHorizonGrid">
+          <!-- Dynamically populated by JS: Gesamt, 1 Jahr, 1 Monat, 7 Tage, Live -->
+        </div>
+      </div>
+
+      <!-- Treasury Time-Series Chart -->
+      <div class="panel-box" style="margin-bottom: 22px;">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <div class="panel-title">
+              <span>📈</span>
+              <span>Treasury Balance History & Burn Trend</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Real-time historical curve of player bank balance and slope projection</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span id="treasuryHistoryStatusPill" style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); padding: 3px 8px; border-radius: 4px;">
+              💾 Auto-saved to disk
+            </span>
+            <div class="mode-toggle-group">
+              <button class="mode-toggle-btn active" id="btnTreasury5m" onclick="window.dashboard.setTreasuryHorizon('5m', this)">5m</button>
+              <button class="mode-toggle-btn" id="btnTreasury15m" onclick="window.dashboard.setTreasuryHorizon('15m', this)">15m</button>
+              <button class="mode-toggle-btn" id="btnTreasury30m" onclick="window.dashboard.setTreasuryHorizon('30m', this)">30m</button>
+              <button class="mode-toggle-btn" id="btnTreasury1h" onclick="window.dashboard.setTreasuryHorizon('1h', this)">1 Hour</button>
+            </div>
+          </div>
+        </div>
+        <div style="height: 220px; width: 100%;">
+          <canvas id="chartTreasuryCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Financial Transparency & Calculation Breakdown (Netto vs Balance Rate) -->
+      <div class="panel-box" style="margin-bottom: 22px; border-left: 4px solid var(--accent-cyan); background: rgba(15, 23, 42, 0.85);">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>💡</span>
+            <span>Finanz-Architektur: Operativer Netto-Saldo vs. Reale Kontostand-Änderung</span>
+          </div>
+          <span class="badge" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.35);">Abrechnungs-Transparenz</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 10px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 1.3rem;">💰</span>
+              <strong style="color: var(--status-emerald); font-size: 0.96rem;">Operativer Netto-Saldo / Min</strong>
+            </div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;">
+              Berechnet sich <strong>ausschließlich aus dem laufenden Fahrbetrieb</strong>:<br>
+              <span style="font-family: var(--font-mono); color: var(--accent-cyan);">+ Einnahmen (Tickets & Frachtauszahlungen)</span><br>
+              <span style="font-family: var(--font-mono); color: var(--status-rose);">- Laufende Fahrzeug-Betriebskosten (Opex)</span><br>
+              <div style="margin-top: 8px; font-size: 0.78rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
+                👉 <em>Zeigt rein das operative Ergebnis deiner Strecken, unbeeinflusst von Baukosten oder Krediten.</em>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 1.3rem;">🏦</span>
+              <strong style="color: #38bdf8; font-size: 0.96rem;">Reale Kontostand-Änderung / Min (Liquiditäts-Rate)</strong>
+            </div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;">
+              Berechnet sich aus der <strong>echten Veränderung deines Bankguthabens</strong>.<br>
+              Hier fließen neben den Ticket-Erlösen zusätzlich ein:<br>
+              <span style="font-family: var(--font-mono); color: #fbbf24;">• Fahrzeugkäufe & -verkäufe im Depot</span><br>
+              <span style="font-family: var(--font-mono); color: #fbbf24;">• Infrastruktur-, Gleis- & Haltestellenbau</span><br>
+              <span style="font-family: var(--font-mono); color: #fbbf24;">• Kreditzinsen (1.5% p.a. monatlich) & Tilgungen</span><br>
+              <div style="margin-top: 8px; font-size: 0.78rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
+                👉 <em>Zeigt, wie viel Geld tatsächlich auf deinem Firmenkonto zunimmt oder abfließt.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Financial Optimization Advisory ("Was muss man ändern?") -->
+      <div class="panel-box" style="margin-bottom: 22px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🩺</span>
+            <span data-i18n="advisoriesTitle">AI Financial Optimization & Immediate Fixes</span>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--accent-cyan);">Automated Accounting Intelligence</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;" id="financialAdvisoryContainer">
+          <div style="color: var(--text-dim); padding: 20px;">Analyzing financial structure...</div>
+        </div>
+      </div>
+
+      <!-- In-Game Accounting Journal Table (Exact 1:1 match to TF3 Earnings Details!) -->
+      <div class="panel-box">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">
+              <span>📑</span>
+              <span data-i18n="journalTitle">In-Game Accounting Journal (4-Year Balance)</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);" data-i18n="journalSub">
+              1:1 exact accounting items matching Transport Fever 3 company records
+            </div>
+          </div>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--status-emerald); border: 1px solid rgba(16, 185, 129, 0.3);">
+            In-Game Native
+          </span>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="telemetry-table" style="font-size: 0.85rem;" id="financeJournalTable">
+            <thead>
+              <tr id="financeJournalHeaderRow" style="background: rgba(15, 23, 42, 0.9);">
+                <th style="min-width: 280px; text-align: left; padding: 12px 16px;">Category / Accounting Item</th>
+                <th style="text-align: right; min-width: 140px; padding: 12px 16px; font-family: var(--font-mono);">1981</th>
+                <th style="text-align: right; min-width: 140px; padding: 12px 16px; font-family: var(--font-mono);">1982</th>
+                <th style="text-align: right; min-width: 140px; padding: 12px 16px; font-family: var(--font-mono);">1983</th>
+                <th style="text-align: right; min-width: 140px; padding: 12px 16px; font-family: var(--font-mono);">1984</th>
+              </tr>
+            </thead>
+            <tbody id="financeJournalTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-dim);">Loading Journal Data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+
+    <!-- ==================================================================== -->
+    <!-- TAB 4: CHARTS                                                        -->
+    <!-- ==================================================================== -->
+    <main class="tab-panel" id="tab-wall-charts">
+      <div class="horizon-bar">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 2px;">📊 Network Charts</h2>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Real-time multi-metric time-series curves</div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="horizon-pill active" onclick="window.dashboard.setChartHorizon('1m')">⚡ 1m Live</button>
+          <button class="horizon-pill" onclick="window.dashboard.setChartHorizon('5m')">⏱️ 5m</button>
+          <button class="horizon-pill" onclick="window.dashboard.setChartHorizon('15m')">⏳ 15m</button>
+          <button class="horizon-pill" onclick="window.dashboard.setChartHorizon('30m')">📅 30m</button>
+          <button class="horizon-pill" onclick="window.dashboard.setChartHorizon('1h')">📈 1 Hour</button>
+        </div>
+      </div>
+
+      <div class="chart-wall-grid">
+        <div class="chart-card-wall">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title"><span>🏆</span> <span>Top 5 Cash Champions</span></div>
+          </div>
+          <div class="chart-canvas-wrapper"><canvas id="chartWallTop5"></canvas></div>
+        </div>
+
+        <div class="chart-card-wall">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title" style="color: var(--status-rose);"><span>💸</span> <span>Top 5 Deficit Bleeders</span></div>
+          </div>
+          <div class="chart-canvas-wrapper"><canvas id="chartWallFlop5"></canvas></div>
+        </div>
+
+        <div class="chart-card-wall">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title"><span>📦</span> <span>Network Volume & Capacity</span></div>
+          </div>
+          <div class="chart-canvas-wrapper"><canvas id="chartWallVolume"></canvas></div>
+        </div>
+
+        <div class="chart-card-wall">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title"><span>👥</span> <span>Terminal Waiting Waves</span></div>
+          </div>
+          <div class="chart-canvas-wrapper"><canvas id="chartWallWaiting"></canvas></div>
+        </div>
+
+        <div class="chart-card-wall">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title"><span>⚡</span> <span>Fleet Speed & Congestion (km/h)</span></div>
+          </div>
+          <div class="chart-canvas-wrapper"><canvas id="chartWallSpeed"></canvas></div>
+        </div>
+
+        <div class="chart-card-wall">
+          <div class="panel-header" style="margin-bottom: 8px;">
+            <div class="panel-title"><span>🔧</span> <span>Fleet Aging & Penalties</span></div>
+          </div>
+          <div class="chart-canvas-wrapper"><canvas id="chartWallMaint"></canvas></div>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- ==================================================================== -->
+    <!-- TAB 5: AI INSIGHTS & FORECASTING                                     -->
+    <!-- ==================================================================== -->
+    <main class="tab-panel" id="tab-patterns">
+      <div class="panel-box" style="margin-bottom: 20px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🧠</span>
+            <span>Route Patterns & Anomalies</span>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--accent-cyan);">Automated Analysis</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;" id="patternCardsContainer">
+          <div style="color: var(--text-dim); padding: 20px;">Scanning network patterns...</div>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🔮</span>
+            <span>Trend Projections (5m / 30m / 1h)</span>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-muted);">Ordered by 1h projection</span>
+        </div>
+        <div class="full-table-wrapper" style="max-height: 480px;">
+          <table class="telemetry-table" id="projectionsTable">
+            <thead>
+              <tr>
+                <th>Route Corridor</th>
+                <th>Type</th>
+                <th>1m Rate</th>
+                <th>5m Proj</th>
+                <th>10m Proj</th>
+                <th>30m Proj</th>
+                <th>1h Proj</th>
+                <th>Pattern</th>
+                <th>Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="projectionsTableBody">
+              <tr>
+                <td colspan="9" style="text-align: center; padding: 30px; color: var(--text-dim);">Loading forecasts...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- ==================================================================== -->
+    <!-- TAB 6: ROUTE DEEP-DIVE INSPECTOR                                     -->
+    <!-- ==================================================================== -->
+    <main class="tab-panel" id="tab-inspector">
+      <div class="panel-box" style="margin-bottom: 20px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🔬</span>
+            <span>Route Deep-Dive Inspector</span>
+          </div>
+          <select id="selectInspectorRoute" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 6px 12px; color: #fff; font-size: 0.85rem;" onchange="window.dashboard.selectRoute(this.value)">
+            <option value="">Select a route to inspect...</option>
+          </select>
+        </div>
+        <div id="inspectorDetailsContent" style="padding: 10px 0;">
+          <div style="color: var(--text-dim); text-align: center; padding: 40px;">Select a route above or click 'Inspect' in the fleet matrix.</div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Date Calibration Modal -->
+  <div class="modal-overlay" id="dateCalibModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="window.dashboard.closeDateCalibration()">✕</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span style="font-size: 1.5rem;">📅</span>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff;">In-Game Calendar Synchronization</h3>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px;">In-Game Date (YYYY-MM-DD or DD.MM.YYYY)</label>
+        <input type="text" id="inputCalibDate" placeholder="1984-06-15" style="width: 100%; background: rgba(7, 10, 18, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 10px 14px; color: #fff; font-family: var(--font-mono); font-size: 1rem;">
+      </div>
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px;">Simulation Speed Factor</label>
+        <select id="selectCalibSpeed" style="width: 100%; background: rgba(7, 10, 18, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 10px 14px; color: #fff; font-family: var(--font-mono); font-size: 0.9rem;">
+          <option value="1.0">Standard 1x (730s / Game Year)</option>
+          <option value="2.0">Fast 2x (365s / Game Year)</option>
+          <option value="4.0">Ultra 4x (182s / Game Year)</option>
+          <option value="0.5">Half 0.5x (1460s / Game Year)</option>
+          <option value="0.0">Paused / Fixed Date</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" style="flex: 1; justify-content: center; height: 42px;" onclick="window.dashboard.syncGameDate()">
+          <span>⚡ Synchronize Calendar</span>
+        </button>
+      </div>
+      <div style="margin-top: 12px; font-size: 0.82rem; color: var(--status-emerald); display: none; align-items: center; gap: 6px;" id="dateCalibSuccessMsg">
+        <span>✓</span> <span id="dateCalibSuccessText">Calendar successfully synchronized!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal for Tablet / Mobile -->
+  <div class="modal-overlay" id="qrModalBackdrop" onclick="window.dashboard.closeQrModal(event)">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="window.dashboard.closeQrModal(null, true)">✕</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span style="font-size: 1.5rem;">📱</span>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff;">Mobile & Tablet Stream</h3>
+      </div>
+      <div style="text-align: center;">
+        <div style="background: #0f172a; padding: 14px; border-radius: var(--radius-md); display: inline-block; margin-bottom: 14px; border: 1px solid var(--border-glass);">
+          <img id="modalQrCodeImg" src="" alt="QR Code" style="width: 180px; height: 180px; display: block;">
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 1rem; color: var(--accent-cyan); font-weight: 700;" id="modalTabletUrl">--</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Scan with your smartphone or tablet camera on the same local network.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLEET REPLACEMENT & MODERNIZATION ADVISOR MODAL -->
+  <div class="cyber-modal-overlay" id="fleetAdvisorModal" style="display: none;" onclick="if(event.target===this) window.dashboard.closeFleetAdvisorModal()">
+    <div class="cyber-modal-box">
+      <div class="cyber-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🛠️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; color: #fff;" data-i18n="fleetAdvisorTitle">Fleet Modernization & Vehicle Replacement Advisor</h3>
+            <div style="font-size: 0.78rem; color: var(--accent-cyan);" data-i18n="fleetAdvisorSubtitle">Intelligent vehicle upgrade recommendations with strict Passenger vs Cargo separation</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="window.dashboard.closeFleetAdvisorModal()">✕</button>
+      </div>
+      
+      <div class="cyber-modal-tabs">
+        <button class="modal-tab-btn active" id="modalTabAll" onclick="window.dashboard.setAdvisorModalTab('ALL')">🌐 All Recommendations</button>
+        <button class="modal-tab-btn" id="modalTabPax" onclick="window.dashboard.setAdvisorModalTab('PAX')">🚌 Passenger Routes (ÖPNV / Transit)</button>
+        <button class="modal-tab-btn" id="modalTabCargo" onclick="window.dashboard.setAdvisorModalTab('CARGO')">🚚 Cargo Routes (Freight & Logistics)</button>
+      </div>
+
+      <div class="cyber-modal-body" id="fleetAdvisorList">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="dashboardToastContainer" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px;"></div>
+
+  <!-- App Script (Bypassing cache with version 3.9) -->
+  <script src="js/dashboard.js?v=3.9"></script>
+</body>
+</html>
